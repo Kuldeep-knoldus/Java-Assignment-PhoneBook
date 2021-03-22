@@ -7,6 +7,14 @@
     <groupId>org.example</groupId>
     <artifactId>JavaPhonebookAssignment</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <checkstyle.config.fail.on.error>true</checkstyle.config.fail.on.error>
+        <skipCodeAnalysis>false</skipCodeAnalysis>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -22,9 +30,74 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
+    <build>
+        <pluginManagement>
+
+            <plugins>
+                <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin.version}</version>
+                </plugin>
+                <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.plugin.version}</version>
+                </plugin>
+
+                <!-- SpotBugs Static Analysis -->
+                <!-- SpotBugs is a plugin which uses static analysis to look for bugs in the source code-->
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${maven.spotbugs.plugin.version}</version>
+                    <configuration>
+                        <effort>Max</effort>
+                        <threshold>Low</threshold>
+                        <failOnError>true</failOnError>
+                        <spotbugsXmlOutputDirectory>${project.build.directory}/findbugs</spotbugsXmlOutputDirectory>
+                        <spotbugsXmlOutputFilename>findbugs.xml</spotbugsXmlOutputFilename>
+                        <includeFilterFile>${basedir}/spotbugs-security-include.xml</includeFilterFile>
+                        <excludeFilterFile>${basedir}/spotbugs-security-exclude.xml</excludeFilterFile>
+                        <plugins>
+                            <plugin>
+                                <groupId>com.h3xstream.findsecbugs</groupId>
+                                <artifactId>findsecbugs-plugin</artifactId>
+                                <version>1.9.0</version>
+                            </plugin>
+                        </plugins>
+                    </configuration>
+                </plugin>
+                
+
+                <!-- CheckStyle Plugin Configuration -->
+                <!--Checkstyle plugin checks the source code if it compiles with coding rules and standards -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven.checkstyle.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <configuration>
+                                <configLocation>checkstyle.xml</configLocation>
+                                <encoding>UTF-8</encoding>
+                                <consoleOutput>true</consoleOutput>
+                                <failsOnError>${checkstyle.config.fail.on.error}</failsOnError>
+                                <failOnViolation>${checkstyle.config.fail.on.error}</failOnViolation>
+                                <outputFile>${basedir}/target/checkstyle/checkstyle-output.xml</outputFile>
+                                <skip>${skipCodeAnalysis}</skip>
+                            </configuration>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
